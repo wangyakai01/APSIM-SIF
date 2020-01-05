@@ -62,7 +62,7 @@ Windows 10
 ![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image7.png)
 
 2. When the run is complete, click the ‘outputfile’ component to view the results and create a graph to see the simulated SIF with observed SIF.
-The relationship between simulation and observation SIF values are reasonable when compared with satellite (TROPOspheric Monitoring Instrument, TROPOMI) and in situ flux-tower measurements at the Energy Farm of the University of Illinois at Urbana-Champaign, USA (40.07°N, 88.21°W). Blue line represents the APSIM-SIF simulated SIF,  red dots represent ground-based measured SIF and green dots represent TROPOMI observed SIF. 
+The relationship between simulation and observation SIF values are reasonable when compared with satellite (TROPOspheric Monitoring Instrument, TROPOMI) and in situ tower measurements at the Energy Farm of the University of Illinois at Urbana-Champaign, USA (40.07°N, 88.21°W). Blue line represents the APSIM-SIF simulated SIF,  red dots represent ground-based measured SIF and green dots represent TROPOMI observed SIF. 
 
 ![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image8.png)
 
