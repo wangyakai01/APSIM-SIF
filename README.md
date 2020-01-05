@@ -48,20 +48,22 @@ Windows 10
 ![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image3.png)
 6.  In the modules script, the [Output] tag denotes a variable that APSIM can supply to output file when requested, you can set what variables you want reported in the 'outputfile' node.
 ![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image4.png)
-7. Runing the simulation and create a graph to see the result.
 ![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image5.png)
+7. Runing the simulation and create a graph to see the result.
+![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image6.png)
+
 
 
 ## Running the tests
 
 1. Once the "UIUC-SIF sim.apsim" simulation has be opened within the APSIM (v7.8) user interface then clicking the 'Run' button.
 
-![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image6.png)
+![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image7.png)
 
 2. When the run is complete, click the ‘outputfile’ component to view the results and create a graph to see the simulated SIF with observed SIF.
 The relationship between simulation and observation SIF values are reasonable when compared with satellite (TROPOspheric Monitoring Instrument, TROPOMI) and in situ flux-tower measurements at the Energy Farm of the University of Illinois at Urbana-Champaign, USA (40.07°N, 88.21°W). Blue line represents the APSIM-SIF simulated SIF,  red dots represent ground-based measured SIF and green dots represent TROPOMI observed SIF. 
 
-![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image7.png)
+![image](https://github.com/wangyakai01/APSIM-SIF/blob/master/image/Image8.png)
 
 
 
