@@ -1,9 +1,9 @@
 # APSIM-SIF
 
-（*Agricultural Production Systems Simulator - solar-induced chlorophyll florescence*）
+（*Agricultural Production Systems Simulator - sun-induced chlorophyll fluorescence*）
 
 ## About APSIM-SIF
-Solar-induced chlorophyll florescence (SIF) can be thought of as the byproduct of the absorbed photosynthetically active radiation times the plant’s fluorescence yield efficiency. Here, we have incorporated equations coupling SIF to photosynthesis in a crop model, the Agricultural Production Systems sIMulator (APSIM).
+Sun-induced chlorophyll fluorescence (SIF) can be thought of as the byproduct of the absorbed photosynthetically active radiation times the plant’s fluorescence yield efficiency. Here, we have incorporated equations coupling SIF to photosynthesis in a crop model, the Agricultural Production Systems sIMulator (APSIM).
 
 
 ## Getting Started
