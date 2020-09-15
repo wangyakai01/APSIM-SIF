@@ -1,0 +1,2695 @@
+     ###     ######     #####   #   #     #   
+    #   #    #     #   #        #   ##   ##   
+   #     #   #     #   #        #   ##   ##   
+   #######   ######     #####   #   # # # #   
+   #     #   #              #   #   #  #  #   
+   #     #   #         #####    #   #  #  #   
+                                              
+                                              
+ The Agricultural Production Systems Simulator
+             Copyright(c) APSRU               
+
+Version                = 7.10 r4207
+Title                  = Ne2soybean
+   Component                        "clock" = %apsim%\Model\Clock.dll
+   Component                          "met" = %apsim%\Model\Input.dll
+Paddock:
+   Component                   "outputfile" = %apsim%\Model\Report.dll
+   Component                        "accum" = %apsim%\Model\Accum.dll
+   Component                   "fertiliser" = %apsim%\Model\Fertiliser.dll
+   Component                   "Irrigation" = %apsim%\Model\Irrigation.dll
+   Component              "Harvesting rule" = %apsim%\Model\Manager.dll
+   Component          "Fertilise at sowing" = %apsim%\Model\Manager.dll
+   Component          "Sow on a fixed date" = %apsim%\Model\Manager.dll
+   Component                   "Soil Water" = %apsim%\Model\SoilWat.dll
+   Component                "Soil Nitrogen" = %apsim%\Model\SoilN.dll
+   Component                      "soybean" = %apsim%\Model\Plant.dll
+   Component             "Irrigate on date" = %apsim%\Model\Manager2.dll
+   Component                     "FLUSPECT" = %apsim%\Model\Manager2.dll
+   Component                       "SIF-C3" = %apsim%\Model\Manager2.dll
+
+------- clock Initialisation --------------------------------------------------
+     Sequencer phases:
+        prepare
+        init_step
+        do_management
+        run_one_step
+        do_pasture_water
+        process
+        do_pasture_growth
+        do_stock
+        do_cashbook
+        post
+        end_step
+     Simulation start date =  1/01/2003
+     Simulation end date   = 24/12/2019
+     Time step =           = 1440 (mins)
+
+------- met Initialisation ----------------------------------------------------
+     Sparse data is not allowed
+     INPUT File name: %apsim%\DCaPST module\Sharecode\US-Ne2.met
+
+------- outputfile Initialisation ---------------------------------------------
+     Output frequency:
+        post
+     Output variables:
+        stage
+        DaysAfterSowing
+        day_of_year
+        MaxT
+        MinT
+        Radn
+        LAI
+        SLN
+        swdef_photo
+        BIOtotalDAY
+        BIOshootDAYPot
+        BIOshootDAY
+        RootShoot
+        EcanDemand
+        EcanSupply
+        TE
+        RadIntDcapst
+        Biomass
+        Yield
+        Fsingle_spectral_toc
+        GPP
+        FPAR
+        height
+        dd/mm/yyyy
+        Je
+        irrigation
+
+     Output file = Ne2soybean.out
+     Format = normal
+
+------- paddock.accum Initialisation ------------------------------------------
+     Initialising
+
+------- paddock.Irrigation Initialisation -------------------------------------
+      Initialising
+     
+        - Reading Parameters
+                      Irrigation parameters
+          -----------------------------------------------
+           Automatic Irrigation Application (Enabled)
+           critical fraction of available soil water =  0.50
+           depth for calculating available soil water =     600.00
+           Irrigation Allocation Budget (Disabled)
+          -----------------------------------------------
+
+------- paddock.Harvesting rule Initialisation --------------------------------
+     Manager rules:
+     
+     SECTION:- end_of_day
+                if (soybean.stagename = 'harvest_ripe' or soybean.plant_status = 'dead') then
+       soybean  harvest
+       soybean  end_crop
+                endif
+     END of rules
+     
+
+------- paddock.Fertilise at sowing Initialisation ----------------------------
+     Manager rules:
+     
+     SECTION:- soybean.sowing
+             fertiliser apply amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+     END of rules
+     
+
+------- paddock.Sow on a fixed date Initialisation ----------------------------
+     Manager rules:
+     
+     SECTION:- start_of_day
+             if (today = date('26-may') then
+       soybean sow plants =37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+              endif
+     END of rules
+     
+
+------- paddock.Soil Water Initialisation -------------------------------------
+     
+         - Reading constants
+     
+        - Reading Soil Property Parameters
+     
+        - Reading Soil Profile Parameters
+     Initial soilwater distributed using "sw" parameter.
+     
+     
+     
+                      Soil Profile Properties
+        ---------------------------------------------------------------------
+              Depth  Air_Dry  LL15   Dul    Sat     Sw     BD   Runoff  SWCON
+                mm     mm/mm  mm/mm  mm/mm  mm/mm  mm/mm  g/cc    wf
+        ---------------------------------------------------------------------
+            0.-   45.  0.076  0.151  0.331  0.442  0.331  1.480  0.346  0.300
+           45.-   91.  0.076  0.151  0.331  0.442  0.331  1.480  0.232  0.300
+           91.-  166.  0.078  0.156  0.331  0.442  0.331  1.480  0.219  0.300
+          166.-  289.  0.150  0.166  0.331  0.442  0.331  1.480  0.149  0.300
+          289.-  493.  0.180  0.200  0.325  0.434  0.325  1.500  0.054  0.300
+          493.-  829.  0.225  0.225  0.311  0.415  0.311  1.550  0.000  0.300
+          829.- 1383.  0.177  0.177  0.294  0.392  0.251  1.610  0.000  0.300
+         1383.- 2296.  0.161  0.161  0.294  0.392  0.161  1.610  0.000  0.300
+        ---------------------------------------------------------------------
+     
+     
+     
+                  Soil Water Holding Capacity
+          ---------------------------------------------------------
+              Depth    Unavailable Available  Max Avail.  Drainable
+                          (LL15)   (SW-LL15)  (DUL-LL15)  (SAT-DUL)
+                            mm        mm          mm         mm
+          ---------------------------------------------------------
+            0.-   45.       6.79       8.10       8.10       4.99
+           45.-   91.       6.95       8.28       8.28       5.11
+           91.-  166.      11.70      13.13      13.13       8.33
+          166.-  289.      20.42      20.30      20.30      13.65
+          289.-  493.      40.80      25.50      25.50      22.24
+          493.-  829.      75.60      28.90      28.90      34.94
+          829.- 1383.      98.06      41.00      64.82      54.29
+         1383.- 2296.     146.99       0.00     121.43      89.47
+          ---------------------------------------------------------
+               Totals     407.31     145.19     290.44     233.02
+          ---------------------------------------------------------
+     
+     
+     
+     
+     
+     
+                  Initial Soil Parameters
+          ---------------------------------------------------------
+                 Insoil        Salb     Dif_Con   Dif_Slope
+          ---------------------------------------------------------
+                   0.00        0.13       40.00       16.00
+          ---------------------------------------------------------
+     
+     
+     
+                  Runoff is predicted using scs curve number:
+                Cn2  Cn_Red  Cn_Cov   H_Eff_Depth
+                                           mm
+          ---------------------------------------------------------
+              73.00   20.00    0.80  450.00
+          ---------------------------------------------------------
+     
+     
+     
+           Using Ritchie evaporation model
+            Cuml evap (U):            6.00 (mm^0.5)
+            CONA:                     3.50 ()
+            Eo from priestly-taylor
+
+------- paddock.Soil Nitrogen Initialisation ----------------------------------
+     
+        - Reading Parameters
+     
+        - Reading Constants
+     Using standard soil mineralisation for soil type Black Vertosol
+     
+     
+     
+           TAV and AMP supplied externally
+     
+     
+     
+                      Soil Profile Properties
+          ------------------------------------------------
+           Layer    pH    OC     NO3     NH4    Urea
+                         (%) (kg/ha) (kg/ha) (kg/ha)
+          ------------------------------------------------
+             1     8.40  1.04    4.33    0.40    0.00
+             2     8.40  1.04    4.43    0.41    0.00
+             3     8.48  1.01    6.18    0.55    0.00
+             4     8.80  0.89    3.82    0.18    0.00
+             5     8.99  0.89    6.43    0.31    0.00
+             6     9.14  0.89    9.52    0.52    0.00
+             7     9.17  0.68   15.17    0.89    0.00
+             8     8.99  0.25   25.00    1.47    0.00
+          ------------------------------------------------
+           Totals               74.88    4.72    0.00
+          ------------------------------------------------
+     
+     
+     
+     
+     
+     
+                  Initial Soil Organic Matter Status
+          ---------------------------------------------------------
+           Layer      Hum-C   Hum-N  Biom-C  Biom-N   FOM-C   FOM-N
+                    (kg/ha) (kg/ha) (kg/ha) (kg/ha) (kg/ha) (kg/ha)
+          ---------------------------------------------------------
+             1       6825.0   546.0   101.4    12.7    17.1     0.4
+             2       6976.7   558.1   103.6    13.0    16.1     0.4
+             3      11042.7   883.4   146.1    18.3    14.6     0.4
+             4      16074.5  1286.0   127.1    15.9    12.5     0.3
+             5      27149.1  2171.9    84.9    10.6     9.5     0.2
+             6      46278.6  3702.3    72.5     9.1     6.2     0.2
+             7      60618.3  4849.5    33.6     4.2     3.0     0.1
+             8      37170.8  2973.7    18.4     2.3     0.9     0.0
+          ---------------------------------------------------------
+           Totals  212135.8 16970.9   687.6    86.0    80.0     2.0
+          ---------------------------------------------------------
+
+------- Irrigate on date Initialisation ---------------------------------------
+
+------- FLUSPECT Initialisation -----------------------------------------------
+
+------- SIF-C3 Initialisation -------------------------------------------------
+------- Start of simulation  --------------------------------------------------
+26 May 2003(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2003(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2003(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2003(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2003(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+30 May 2003(Day of year=150), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   20.09 (mm)
+9 June 2003(Day of year=160), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.17 (g/m^2)   lai          =   0.034 (m^2/m^2)
+                     stover N conc =     4.94 (%)    extractable sw =   71.95 (mm)
+29 July 2003(Day of year=210), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         244.04 (g/m^2)   lai          =   4.020 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  181.27 (mm)
+31 July 2003(Day of year=212), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         278.15 (g/m^2)   lai          =   4.447 (m^2/m^2)
+                     stover N conc =     3.56 (%)    extractable sw =  199.13 (mm)
+23 August 2003(Day of year=235), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         670.50 (g/m^2)   lai          =   6.379 (m^2/m^2)
+                     stover N conc =     3.09 (%)    extractable sw =  172.36 (mm)
+30 September 2003(Day of year=273), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9245.56 (kg/ha)
+30 September 2003(Day of year=273), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  212                           stover (kg/ha)         =     5941.6
+      maturity day           =    0                           grain yield (kg/ha)    =     3304.0
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3610.9
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.509
+      total above ground biomass (kg/ha)    =     9245.6
+      live above ground biomass (kg/ha)     =     9245.6
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9245.6
+      number of leaves       =     18.6
+      DM Root:Shoot ratio    =     0.32                       Harvest Index          =       0.36
+      Stover C:N ratio       =    17.16                       Root C:N ratio         =      19.74
+      grain N percent        =     6.50                       total N content (kg/ha)=     353.25
+      grain N uptake (kg/ha) =   214.76                       senesced N content (kg/ha)=  138.49
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.002
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5941.6                     0.0
+                          N  (kg/ha) =                 138.49                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3304.0                     0.0
+                          N  (kg/ha) =                 214.76                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2974.4
+                          N  (kg/ha) =                   0.00                   60.26
+     
+26 May 2004(Day of year=147), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2004(Day of year=147), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            147   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2004(Day of year=147), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2004(Day of year=147), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2004(Day of year=148), paddock.soybean: 
+      stage 2.0 germination
+30 May 2004(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   38.59 (mm)
+7 June 2004(Day of year=159), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.51 (g/m^2)   lai          =   0.041 (m^2/m^2)
+                     stover N conc =     4.81 (%)    extractable sw =   70.40 (mm)
+1 August 2004(Day of year=214), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         273.69 (g/m^2)   lai          =   4.479 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  214.68 (mm)
+3 August 2004(Day of year=216), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         307.31 (g/m^2)   lai          =   4.862 (m^2/m^2)
+                     stover N conc =     3.57 (%)    extractable sw =  201.24 (mm)
+3 September 2004(Day of year=247), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         823.63 (g/m^2)   lai          =   6.618 (m^2/m^2)
+                     stover N conc =     3.09 (%)    extractable sw =  172.10 (mm)
+3 October 2004(Day of year=277), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 10598.30 (kg/ha)
+3 October 2004(Day of year=277), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  216                           stover (kg/ha)         =     7135.6
+      maturity day           =    0                           grain yield (kg/ha)    =     3457.7
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3778.9
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.768
+      total above ground biomass (kg/ha)    =    10593.4
+      live above ground biomass (kg/ha)     =    10593.4
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =    10593.4
+      number of leaves       =     21.5
+      DM Root:Shoot ratio    =     0.33                       Harvest Index          =       0.33
+      Stover C:N ratio       =    17.19                       Root C:N ratio         =      19.91
+      grain N percent        =     6.50                       total N content (kg/ha)=     390.83
+      grain N uptake (kg/ha) =   224.75                       senesced N content (kg/ha)=  166.08
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.003
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                7135.6                     0.0
+                          N  (kg/ha) =                 166.08                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3457.7                     0.0
+                          N  (kg/ha) =                 224.75                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3512.4
+                          N  (kg/ha) =                   0.00                   70.55
+     
+26 May 2005(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2005(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2005(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2005(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2005(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+2 June 2005(Day of year=153), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   26.63 (mm)
+7 June 2005(Day of year=158), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.91 (g/m^2)   lai          =   0.028 (m^2/m^2)
+                     stover N conc =     5.06 (%)    extractable sw =   82.90 (mm)
+25 July 2005(Day of year=206), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         230.58 (g/m^2)   lai          =   3.834 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  310.96 (mm)
+27 July 2005(Day of year=208), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         262.85 (g/m^2)   lai          =   4.237 (m^2/m^2)
+                     stover N conc =     3.53 (%)    extractable sw =  308.16 (mm)
+21 August 2005(Day of year=233), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         673.45 (g/m^2)   lai          =   6.339 (m^2/m^2)
+                     stover N conc =     3.07 (%)    extractable sw =  226.30 (mm)
+30 September 2005(Day of year=273), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9542.42 (kg/ha)
+30 September 2005(Day of year=273), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  208                           stover (kg/ha)         =     6023.1
+      maturity day           =    0                           grain yield (kg/ha)    =     3519.3
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3846.2
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.466
+      total above ground biomass (kg/ha)    =     9542.4
+      live above ground biomass (kg/ha)     =     9542.4
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9542.4
+      number of leaves       =     18.5
+      DM Root:Shoot ratio    =     0.31                       Harvest Index          =       0.37
+      Stover C:N ratio       =    19.13                       Root C:N ratio         =      19.85
+      grain N percent        =     6.50                       total N content (kg/ha)=     354.72
+      grain N uptake (kg/ha) =   228.75                       senesced N content (kg/ha)=  125.97
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6023.1                     0.0
+                          N  (kg/ha) =                 125.97                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3519.3                     0.0
+                          N  (kg/ha) =                 228.75                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2918.6
+                          N  (kg/ha) =                   0.00                   58.82
+     
+26 May 2006(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2006(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2006(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2006(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2006(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+29 May 2006(Day of year=149), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   22.52 (mm)
+3 June 2006(Day of year=154), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.98 (g/m^2)   lai          =   0.030 (m^2/m^2)
+                     stover N conc =     5.01 (%)    extractable sw =   38.85 (mm)
+24 July 2006(Day of year=205), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         253.82 (g/m^2)   lai          =   4.191 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  147.29 (mm)
+25 July 2006(Day of year=206), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         268.51 (g/m^2)   lai          =   4.333 (m^2/m^2)
+                     stover N conc =     3.72 (%)    extractable sw =  139.64 (mm)
+16 August 2006(Day of year=228), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         622.91 (g/m^2)   lai          =   6.187 (m^2/m^2)
+                     stover N conc =     3.09 (%)    extractable sw =  209.61 (mm)
+6 October 2006(Day of year=279), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9470.74 (kg/ha)
+6 October 2006(Day of year=279), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  206                           stover (kg/ha)         =     5660.5
+      maturity day           =    0                           grain yield (kg/ha)    =     3810.2
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4164.1
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.303
+      total above ground biomass (kg/ha)    =     9470.7
+      live above ground biomass (kg/ha)     =     9470.7
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9470.7
+      number of leaves       =     17.7
+      DM Root:Shoot ratio    =     0.30                       Harvest Index          =       0.40
+      Stover C:N ratio       =    19.30                       Root C:N ratio         =      19.79
+      grain N percent        =     6.50                       total N content (kg/ha)=     364.97
+      grain N uptake (kg/ha) =   247.66                       senesced N content (kg/ha)=  117.31
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.001
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5660.5                     0.0
+                          N  (kg/ha) =                 117.31                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3810.2                     0.0
+                          N  (kg/ha) =                 247.66                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2806.1
+                          N  (kg/ha) =                   0.00                   56.71
+     
+26 May 2007(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2007(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2007(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2007(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2007(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+31 May 2007(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   31.69 (mm)
+7 June 2007(Day of year=158), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.33 (g/m^2)   lai          =   0.037 (m^2/m^2)
+                     stover N conc =     4.86 (%)    extractable sw =   69.47 (mm)
+26 July 2007(Day of year=207), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         244.98 (g/m^2)   lai          =   4.055 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  324.29 (mm)
+27 July 2007(Day of year=208), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         261.87 (g/m^2)   lai          =   4.225 (m^2/m^2)
+                     stover N conc =     3.70 (%)    extractable sw =  327.15 (mm)
+17 August 2007(Day of year=229), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         592.96 (g/m^2)   lai          =   5.830 (m^2/m^2)
+                     stover N conc =     3.09 (%)    extractable sw =  330.36 (mm)
+26 September 2007(Day of year=269), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 8403.20 (kg/ha)
+26 September 2007(Day of year=269), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  208                           stover (kg/ha)         =     5312.4
+      maturity day           =    0                           grain yield (kg/ha)    =     3090.8
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3377.9
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      5.970
+      total above ground biomass (kg/ha)    =     8403.2
+      live above ground biomass (kg/ha)     =     8403.2
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     8403.2
+      number of leaves       =     17.2
+      DM Root:Shoot ratio    =     0.33                       Harvest Index          =       0.37
+      Stover C:N ratio       =    18.65                       Root C:N ratio         =      19.72
+      grain N percent        =     6.50                       total N content (kg/ha)=     314.83
+      grain N uptake (kg/ha) =   200.90                       senesced N content (kg/ha)=  113.93
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5312.4                     0.0
+                          N  (kg/ha) =                 113.93                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3090.8                     0.0
+                          N  (kg/ha) =                 200.90                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2777.8
+                          N  (kg/ha) =                   0.00                   56.34
+     
+26 May 2008(Day of year=147), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2008(Day of year=147), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            147   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2008(Day of year=147), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2008(Day of year=147), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2008(Day of year=148), paddock.soybean: 
+      stage 2.0 germination
+1 June 2008(Day of year=153), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   28.24 (mm)
+5 June 2008(Day of year=157), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.57 (g/m^2)   lai          =   0.021 (m^2/m^2)
+                     stover N conc =     5.25 (%)    extractable sw =   69.19 (mm)
+27 July 2008(Day of year=209), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         278.07 (g/m^2)   lai          =   4.529 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  256.58 (mm)
+28 July 2008(Day of year=210), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         296.58 (g/m^2)   lai          =   4.698 (m^2/m^2)
+                     stover N conc =     3.71 (%)    extractable sw =  248.77 (mm)
+22 August 2008(Day of year=235), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         730.10 (g/m^2)   lai          =   6.546 (m^2/m^2)
+                     stover N conc =     3.07 (%)    extractable sw =  216.46 (mm)
+26 October 2008(Day of year=300), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 10357.63 (kg/ha)
+26 October 2008(Day of year=300), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  210                           stover (kg/ha)         =     6521.2
+      maturity day           =    0                           grain yield (kg/ha)    =     3836.4
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4192.8
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.690
+      total above ground biomass (kg/ha)    =    10357.6
+      live above ground biomass (kg/ha)     =    10357.6
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =    10357.6
+      number of leaves       =     19.7
+      DM Root:Shoot ratio    =     0.28                       Harvest Index          =       0.37
+      Stover C:N ratio       =    18.59                       Root C:N ratio         =      19.41
+      grain N percent        =     6.50                       total N content (kg/ha)=     389.65
+      grain N uptake (kg/ha) =   249.36                       senesced N content (kg/ha)=  140.28
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6521.2                     0.0
+                          N  (kg/ha) =                 140.28                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3836.4                     0.0
+                          N  (kg/ha) =                 249.36                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2894.3
+                          N  (kg/ha) =                   0.00                   59.66
+     
+26 May 2009(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2009(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2009(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2009(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2009(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+31 May 2009(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   19.37 (mm)
+7 June 2009(Day of year=158), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.95 (g/m^2)   lai          =   0.029 (m^2/m^2)
+                     stover N conc =     5.03 (%)    extractable sw =   89.78 (mm)
+3 August 2009(Day of year=215), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         280.98 (g/m^2)   lai          =   4.591 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  242.30 (mm)
+5 August 2009(Day of year=217), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         317.41 (g/m^2)   lai          =   5.001 (m^2/m^2)
+                     stover N conc =     3.57 (%)    extractable sw =  241.18 (mm)
+5 September 2009(Day of year=248), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         819.10 (g/m^2)   lai          =   6.524 (m^2/m^2)
+                     stover N conc =     3.08 (%)    extractable sw =  235.14 (mm)
+5 October 2009(Day of year=278), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 10457.41 (kg/ha)
+5 October 2009(Day of year=278), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  217                           stover (kg/ha)         =     7039.7
+      maturity day           =    0                           grain yield (kg/ha)    =     3412.7
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3729.8
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.683
+      total above ground biomass (kg/ha)    =    10452.5
+      live above ground biomass (kg/ha)     =    10452.5
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =    10452.5
+      number of leaves       =     21.6
+      DM Root:Shoot ratio    =     0.34                       Harvest Index          =       0.33
+      Stover C:N ratio       =    15.87                       Root C:N ratio         =      19.89
+      grain N percent        =     6.50                       total N content (kg/ha)=     399.26
+      grain N uptake (kg/ha) =   221.83                       senesced N content (kg/ha)=  177.43
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.001
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                7039.7                     0.0
+                          N  (kg/ha) =                 177.43                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3412.7                     0.0
+                          N  (kg/ha) =                 221.83                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3517.8
+                          N  (kg/ha) =                   0.00                   70.74
+     
+26 May 2010(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2010(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2010(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2010(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2010(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+30 May 2010(Day of year=150), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   19.33 (mm)
+5 June 2010(Day of year=156), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.18 (g/m^2)   lai          =   0.034 (m^2/m^2)
+                     stover N conc =     4.92 (%)    extractable sw =   80.80 (mm)
+26 July 2010(Day of year=207), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         260.35 (g/m^2)   lai          =   4.291 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  276.78 (mm)
+27 July 2010(Day of year=208), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         277.90 (g/m^2)   lai          =   4.459 (m^2/m^2)
+                     stover N conc =     3.71 (%)    extractable sw =  269.04 (mm)
+18 August 2010(Day of year=230), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         650.63 (g/m^2)   lai          =   6.291 (m^2/m^2)
+                     stover N conc =     3.08 (%)    extractable sw =  233.06 (mm)
+4 October 2010(Day of year=277), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9637.63 (kg/ha)
+4 October 2010(Day of year=277), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  208                           stover (kg/ha)         =     5876.0
+      maturity day           =    0                           grain yield (kg/ha)    =     3761.6
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4111.0
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.485
+      total above ground biomass (kg/ha)    =     9637.6
+      live above ground biomass (kg/ha)     =     9637.6
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9637.6
+      number of leaves       =     18.3
+      DM Root:Shoot ratio    =     0.31                       Harvest Index          =       0.39
+      Stover C:N ratio       =    19.18                       Root C:N ratio         =      19.77
+      grain N percent        =     6.50                       total N content (kg/ha)=     367.06
+      grain N uptake (kg/ha) =   244.50                       senesced N content (kg/ha)=  122.55
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.003
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5876.0                     0.0
+                          N  (kg/ha) =                 122.55                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3761.6                     0.0
+                          N  (kg/ha) =                 244.50                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2939.8
+                          N  (kg/ha) =                   0.00                   59.47
+     
+26 May 2011(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2011(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2011(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2011(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2011(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+31 May 2011(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   30.79 (mm)
+4 June 2011(Day of year=155), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.68 (g/m^2)   lai          =   0.023 (m^2/m^2)
+                     stover N conc =     5.22 (%)    extractable sw =   44.82 (mm)
+26 July 2011(Day of year=207), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         213.61 (g/m^2)   lai          =   3.563 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  269.58 (mm)
+27 July 2011(Day of year=208), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         229.43 (g/m^2)   lai          =   3.722 (m^2/m^2)
+                     stover N conc =     3.70 (%)    extractable sw =  267.79 (mm)
+19 August 2011(Day of year=231), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         595.60 (g/m^2)   lai          =   5.820 (m^2/m^2)
+                     stover N conc =     3.09 (%)    extractable sw =  254.82 (mm)
+11 October 2011(Day of year=284), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 8661.44 (kg/ha)
+11 October 2011(Day of year=284), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  208                           stover (kg/ha)         =     5345.6
+      maturity day           =    0                           grain yield (kg/ha)    =     3315.8
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3623.9
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      5.930
+      total above ground biomass (kg/ha)    =     8661.4
+      live above ground biomass (kg/ha)     =     8661.4
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     8661.4
+      number of leaves       =     16.9
+      DM Root:Shoot ratio    =     0.29                       Harvest Index          =       0.38
+      Stover C:N ratio       =    17.78                       Root C:N ratio         =      19.44
+      grain N percent        =     6.50                       total N content (kg/ha)=     335.81
+      grain N uptake (kg/ha) =   215.53                       senesced N content (kg/ha)=  120.28
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.004
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5345.6                     0.0
+                          N  (kg/ha) =                 120.28                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3315.8                     0.0
+                          N  (kg/ha) =                 215.53                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2494.4
+                          N  (kg/ha) =                   0.00                   51.32
+     
+26 May 2012(Day of year=147), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2012(Day of year=147), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            147   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2012(Day of year=147), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2012(Day of year=147), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2012(Day of year=148), paddock.soybean: 
+      stage 2.0 germination
+1 June 2012(Day of year=153), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.008 (m^2/m^2)
+                     stover N conc =     7.54 (%)    extractable sw =   20.94 (mm)
+7 June 2012(Day of year=159), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.08 (g/m^2)   lai          =   0.029 (m^2/m^2)
+                     stover N conc =     4.82 (%)    extractable sw =   63.47 (mm)
+25 July 2012(Day of year=207), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         221.81 (g/m^2)   lai          =   3.685 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  219.71 (mm)
+27 July 2012(Day of year=209), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         255.71 (g/m^2)   lai          =   4.113 (m^2/m^2)
+                     stover N conc =     3.52 (%)    extractable sw =  202.42 (mm)
+23 August 2012(Day of year=236), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         709.78 (g/m^2)   lai          =   6.439 (m^2/m^2)
+                     stover N conc =     3.10 (%)    extractable sw =  143.05 (mm)
+24 September 2012(Day of year=268), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9576.83 (kg/ha)
+24 September 2012(Day of year=268), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  209                           stover (kg/ha)         =     6217.3
+      maturity day           =    0                           grain yield (kg/ha)    =     3354.0
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3665.6
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.575
+      total above ground biomass (kg/ha)    =     9571.3
+      live above ground biomass (kg/ha)     =     9571.3
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9571.3
+      number of leaves       =     19.0
+      DM Root:Shoot ratio    =     0.32                       Harvest Index          =       0.35
+      Stover C:N ratio       =    17.34                       Root C:N ratio         =      19.93
+      grain N percent        =     6.50                       total N content (kg/ha)=     361.39
+      grain N uptake (kg/ha) =   218.01                       senesced N content (kg/ha)=  143.38
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6217.3                     0.0
+                          N  (kg/ha) =                 143.38                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3354.0                     0.0
+                          N  (kg/ha) =                 218.01                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3043.0
+                          N  (kg/ha) =                   0.00                   61.08
+     
+26 May 2013(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2013(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2013(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2013(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2013(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+31 May 2013(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   30.48 (mm)
+8 June 2013(Day of year=159), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.89 (g/m^2)   lai          =   0.028 (m^2/m^2)
+                     stover N conc =     5.05 (%)    extractable sw =  105.20 (mm)
+29 July 2013(Day of year=210), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         245.72 (g/m^2)   lai          =   4.067 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  186.77 (mm)
+31 July 2013(Day of year=212), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         277.54 (g/m^2)   lai          =   4.451 (m^2/m^2)
+                     stover N conc =     3.56 (%)    extractable sw =  181.80 (mm)
+25 August 2013(Day of year=237), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         691.15 (g/m^2)   lai          =   6.413 (m^2/m^2)
+                     stover N conc =     3.11 (%)    extractable sw =  124.20 (mm)
+5 October 2013(Day of year=278), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9688.22 (kg/ha)
+5 October 2013(Day of year=278), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  212                           stover (kg/ha)         =     6148.2
+      maturity day           =    0                           grain yield (kg/ha)    =     3540.0
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3868.8
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.546
+      total above ground biomass (kg/ha)    =     9688.2
+      live above ground biomass (kg/ha)     =     9688.2
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9688.2
+      number of leaves       =     18.9
+      DM Root:Shoot ratio    =     0.31                       Harvest Index          =       0.37
+      Stover C:N ratio       =    19.20                       Root C:N ratio         =      19.87
+      grain N percent        =     6.50                       total N content (kg/ha)=     358.16
+      grain N uptake (kg/ha) =   230.10                       senesced N content (kg/ha)=  128.06
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6148.2                     0.0
+                          N  (kg/ha) =                 128.06                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3540.0                     0.0
+                          N  (kg/ha) =                 230.10                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3037.4
+                          N  (kg/ha) =                   0.00                   61.14
+     
+26 May 2014(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2014(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2014(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2014(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2014(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+30 May 2014(Day of year=150), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   21.07 (mm)
+3 June 2014(Day of year=154), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.66 (g/m^2)   lai          =   0.023 (m^2/m^2)
+                     stover N conc =     5.20 (%)    extractable sw =   67.74 (mm)
+29 July 2014(Day of year=210), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         285.07 (g/m^2)   lai          =   4.649 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  196.55 (mm)
+1 August 2014(Day of year=213), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         340.69 (g/m^2)   lai          =   5.297 (m^2/m^2)
+                     stover N conc =     3.46 (%)    extractable sw =  216.33 (mm)
+24 August 2014(Day of year=236), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         722.31 (g/m^2)   lai          =   6.531 (m^2/m^2)
+                     stover N conc =     3.07 (%)    extractable sw =  221.05 (mm)
+12 October 2014(Day of year=285), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9068.99 (kg/ha)
+12 October 2014(Day of year=285), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  213                           stover (kg/ha)         =     6379.2
+      maturity day           =    0                           grain yield (kg/ha)    =     2689.7
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     2939.6
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.674
+      total above ground biomass (kg/ha)    =     9069.0
+      live above ground biomass (kg/ha)     =     9069.0
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9069.0
+      number of leaves       =     20.1
+      DM Root:Shoot ratio    =     0.33                       Harvest Index          =       0.30
+      Stover C:N ratio       =    15.62                       Root C:N ratio         =      19.25
+      grain N percent        =     6.50                       total N content (kg/ha)=     338.20
+      grain N uptake (kg/ha) =   174.83                       senesced N content (kg/ha)=  163.37
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.000
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6379.2                     0.0
+                          N  (kg/ha) =                 163.37                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                2689.7                     0.0
+                          N  (kg/ha) =                 174.83                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3006.8
+                          N  (kg/ha) =                   0.00                   62.47
+     
+26 May 2015(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2015(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2015(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2015(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2015(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+1 June 2015(Day of year=152), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   18.11 (mm)
+7 June 2015(Day of year=158), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.91 (g/m^2)   lai          =   0.028 (m^2/m^2)
+                     stover N conc =     5.02 (%)    extractable sw =   64.19 (mm)
+28 July 2015(Day of year=209), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         235.26 (g/m^2)   lai          =   3.905 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  259.26 (mm)
+30 July 2015(Day of year=211), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         269.84 (g/m^2)   lai          =   4.338 (m^2/m^2)
+                     stover N conc =     3.53 (%)    extractable sw =  246.95 (mm)
+25 August 2015(Day of year=237), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         696.95 (g/m^2)   lai          =   6.399 (m^2/m^2)
+                     stover N conc =     3.08 (%)    extractable sw =  229.05 (mm)
+12 October 2015(Day of year=285), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 10056.51 (kg/ha)
+12 October 2015(Day of year=285), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  211                           stover (kg/ha)         =     6249.0
+      maturity day           =    0                           grain yield (kg/ha)    =     3807.5
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4161.2
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.532
+      total above ground biomass (kg/ha)    =    10056.5
+      live above ground biomass (kg/ha)     =    10056.5
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =    10056.5
+      number of leaves       =     19.0
+      DM Root:Shoot ratio    =     0.29                       Harvest Index          =       0.38
+      Stover C:N ratio       =    19.52                       Root C:N ratio         =      19.79
+      grain N percent        =     6.50                       total N content (kg/ha)=     375.54
+      grain N uptake (kg/ha) =   247.49                       senesced N content (kg/ha)=  128.05
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.001
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6249.0                     0.0
+                          N  (kg/ha) =                 128.05                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3807.5                     0.0
+                          N  (kg/ha) =                 247.49                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2900.7
+                          N  (kg/ha) =                   0.00                   58.62
+     
+26 May 2016(Day of year=147), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2016(Day of year=147), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            147   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2016(Day of year=147), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2016(Day of year=147), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2016(Day of year=148), paddock.soybean: 
+      stage 2.0 germination
+30 May 2016(Day of year=151), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   26.69 (mm)
+5 June 2016(Day of year=157), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.49 (g/m^2)   lai          =   0.041 (m^2/m^2)
+                     stover N conc =     4.83 (%)    extractable sw =   75.29 (mm)
+22 July 2016(Day of year=204), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         244.17 (g/m^2)   lai          =   4.042 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  251.41 (mm)
+24 July 2016(Day of year=206), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         276.68 (g/m^2)   lai          =   4.445 (m^2/m^2)
+                     stover N conc =     3.56 (%)    extractable sw =  238.34 (mm)
+16 August 2016(Day of year=229), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         677.11 (g/m^2)   lai          =   6.431 (m^2/m^2)
+                     stover N conc =     3.08 (%)    extractable sw =  260.43 (mm)
+25 September 2016(Day of year=269), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9818.31 (kg/ha)
+25 September 2016(Day of year=269), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  206                           stover (kg/ha)         =     6087.5
+      maturity day           =    0                           grain yield (kg/ha)    =     3730.8
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4077.3
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.566
+      total above ground biomass (kg/ha)    =     9818.3
+      live above ground biomass (kg/ha)     =     9818.3
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9818.3
+      number of leaves       =     18.7
+      DM Root:Shoot ratio    =     0.31                       Harvest Index          =       0.38
+      Stover C:N ratio       =    19.10                       Root C:N ratio         =      19.91
+      grain N percent        =     6.50                       total N content (kg/ha)=     369.99
+      grain N uptake (kg/ha) =   242.50                       senesced N content (kg/ha)=  127.49
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.003
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6087.5                     0.0
+                          N  (kg/ha) =                 127.49                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3730.8                     0.0
+                          N  (kg/ha) =                 242.50                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3023.4
+                          N  (kg/ha) =                   0.00                   60.75
+     
+26 May 2017(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2017(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2017(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2017(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2017(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+1 June 2017(Day of year=152), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   19.52 (mm)
+5 June 2017(Day of year=156), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.86 (g/m^2)   lai          =   0.027 (m^2/m^2)
+                     stover N conc =     5.11 (%)    extractable sw =   37.62 (mm)
+25 July 2017(Day of year=206), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         264.21 (g/m^2)   lai          =   4.335 (m^2/m^2)
+                     stover N conc =     3.79 (%)    extractable sw =  237.06 (mm)
+27 July 2017(Day of year=208), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         289.39 (g/m^2)   lai          =   4.598 (m^2/m^2)
+                     stover N conc =     3.54 (%)    extractable sw =  244.95 (mm)
+24 August 2017(Day of year=236), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         768.14 (g/m^2)   lai          =   6.595 (m^2/m^2)
+                     stover N conc =     3.08 (%)    extractable sw =  206.83 (mm)
+12 October 2017(Day of year=285), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 11034.32 (kg/ha)
+12 October 2017(Day of year=285), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  208                           stover (kg/ha)         =     6850.3
+      maturity day           =    0                           grain yield (kg/ha)    =     4184.0
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     4572.7
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.743
+      total above ground biomass (kg/ha)    =    11034.3
+      live above ground biomass (kg/ha)     =    11034.3
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =    11034.3
+      number of leaves       =     20.2
+      DM Root:Shoot ratio    =     0.29                       Harvest Index          =       0.38
+      Stover C:N ratio       =    19.37                       Root C:N ratio         =      19.79
+      grain N percent        =     6.50                       total N content (kg/ha)=     413.43
+      grain N uptake (kg/ha) =   271.96                       senesced N content (kg/ha)=  141.46
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.003
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6850.3                     0.0
+                          N  (kg/ha) =                 141.46                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                4184.0                     0.0
+                          N  (kg/ha) =                 271.96                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  3172.0
+                          N  (kg/ha) =                   0.00                   64.12
+     
+26 May 2018(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2018(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2018(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2018(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2018(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+30 May 2018(Day of year=150), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   30.42 (mm)
+4 June 2018(Day of year=155), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           2.14 (g/m^2)   lai          =   0.033 (m^2/m^2)
+                     stover N conc =     4.93 (%)    extractable sw =   53.02 (mm)
+23 July 2018(Day of year=204), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         238.63 (g/m^2)   lai          =   3.958 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  258.06 (mm)
+25 July 2018(Day of year=206), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         272.33 (g/m^2)   lai          =   4.384 (m^2/m^2)
+                     stover N conc =     3.56 (%)    extractable sw =  245.35 (mm)
+19 August 2018(Day of year=231), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         695.57 (g/m^2)   lai          =   6.476 (m^2/m^2)
+                     stover N conc =     3.12 (%)    extractable sw =  220.26 (mm)
+4 October 2018(Day of year=277), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9731.55 (kg/ha)
+4 October 2018(Day of year=277), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  206                           stover (kg/ha)         =     6195.7
+      maturity day           =    0                           grain yield (kg/ha)    =     3535.8
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3864.3
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.614
+      total above ground biomass (kg/ha)    =     9731.5
+      live above ground biomass (kg/ha)     =     9731.5
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9731.5
+      number of leaves       =     19.2
+      DM Root:Shoot ratio    =     0.30                       Harvest Index          =       0.36
+      Stover C:N ratio       =    19.21                       Root C:N ratio         =      19.72
+      grain N percent        =     6.50                       total N content (kg/ha)=     358.82
+      grain N uptake (kg/ha) =   229.83                       senesced N content (kg/ha)=  128.99
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.001
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                6195.7                     0.0
+                          N  (kg/ha) =                 128.99                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3535.8                     0.0
+                          N  (kg/ha) =                 229.83                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2932.8
+                          N  (kg/ha) =                   0.00                   59.50
+     
+26 May 2019(Day of year=146), paddock.Sow on a fixed date: 
+     Manager sending message :- soybean sow  plants = 37.2, sowing_depth = 32, cultivar = davis, row_spacing = 762, crop_class = plant
+26 May 2019(Day of year=146), paddock.soybean: 
+     Crop Sow
+        ------------------------------------------------
+        cultivar                   = davis
+        Phases:
+           out
+           sowing
+           germination
+              shoot_lag                  =      10 (dd)
+              shoot_rate                 =       1 (dd/mm)
+           emergence
+              cumvd_emergence            =       0     100 (vd)
+              tt_emergence               =      60      60 (dd)
+           end_of_juvenile
+              x_pp_end_of_juvenile       =      12      18 (h)
+              y_tt_end_of_juvenile       =     350     850 (dd)
+           floral_initiation
+              x_pp_floral_initiation     =       1      24 (h)
+              y_tt_floral_initiation     =      24      24 (dd)
+           flowering
+              x_pp_flowering             =       1      24 (h)
+              y_tt_flowering             =     300     300 (dd)
+           start_grain_fill
+              x_pp_start_grain_fill      =       1      24 (h)
+              y_tt_start_grain_fill      =     460     460 (dd)
+           end_grain_fill
+              tt_end_grain_fill          =      40 (dd)
+           maturity
+              tt_maturity                =       5 (dd)
+           harvest_ripe
+              tt_harvest_ripe            =       1 (dd)
+           end_crop
+     
+        x_pp_hi_incr               =       1.00      24.00
+        y_hi_incr                  =     0.0110     0.0110
+        x_hi_max_pot_stress        =       0.00       1.00
+        y_hi_max_pot               =       0.50       0.50
+        ------------------------------------------------
+     
+     
+                        Root Profile
+         -----------------------------------------------
+          Layer       Kl           Lower    Exploration
+          Depth     Factor         Limit      Factor
+          (mm)         ()        (mm/mm)       (0-1)
+         -----------------------------------------------
+          45.0     0.100          0.151       1.000
+          46.0     0.100          0.151       1.000
+          75.0     0.100          0.156       1.000
+         123.0     0.100          0.166       1.000
+         204.0     0.100          0.200       1.000
+         336.0     0.100          0.225       1.000
+         554.0     0.080          0.177       1.000
+         913.0     0.050          0.161       1.000
+         -----------------------------------------------
+         Extractable SW:   290mm in  2296mm total depth ( 13%).
+         Crop factor for bounding water use is set to 100.0 times eo.
+      stage 1.0 sowing
+     
+                      Crop Sowing Data
+         ------------------------------------------------
+         Sowing  Depth Plants Spacing Skip  Skip  Cultivar
+         Day no   mm     m^2     mm   row   plant name
+         ------------------------------------------------
+            146   32.0   37.2  762.0   0.0   0.0 davis
+         ------------------------------------------------
+     
+26 May 2019(Day of year=146), paddock.Fertilise at sowing: 
+     Manager sending message :- fertiliser apply  amount = 150 (kg/ha), depth = 50 (mm), type = urea_n
+26 May 2019(Day of year=146), fertiliser: 
+     
+   - Reading Fertiliser Type Parameters
+       150.00 of N as urea (urea_n)
+                                         added at depth   50.00 (layer   2)
+27 May 2019(Day of year=147), paddock.soybean: 
+      stage 2.0 germination
+1 June 2019(Day of year=152), paddock.soybean: 
+      stage 3.0 emergence
+                     biomass =           1.12 (g/m^2)   lai          =   0.011 (m^2/m^2)
+                     stover N conc =     6.00 (%)    extractable sw =   25.13 (mm)
+6 June 2019(Day of year=157), paddock.soybean: 
+      stage 4.0 end_of_juvenile
+                     biomass =           1.84 (g/m^2)   lai          =   0.027 (m^2/m^2)
+                     stover N conc =     5.07 (%)    extractable sw =   54.98 (mm)
+27 July 2019(Day of year=208), paddock.soybean: 
+      stage 5.0 floral_initiation
+                     biomass =         229.20 (g/m^2)   lai          =   3.802 (m^2/m^2)
+                     stover N conc =     3.78 (%)    extractable sw =  250.48 (mm)
+28 July 2019(Day of year=209), paddock.soybean: 
+      stage 6.0 flowering
+                     biomass =         240.71 (g/m^2)   lai          =   3.917 (m^2/m^2)
+                     stover N conc =     3.72 (%)    extractable sw =  246.87 (mm)
+21 August 2019(Day of year=233), paddock.soybean: 
+      stage 7.0 start_grain_fill
+                     biomass =         623.69 (g/m^2)   lai          =   6.145 (m^2/m^2)
+                     stover N conc =     3.13 (%)    extractable sw =  208.31 (mm)
+30 September 2019(Day of year=273), paddock.soybean: 
+     Crop failure because of total leaf senescence.
+     Plant death. standing above-ground dm = 9154.48 (kg/ha)
+30 September 2019(Day of year=273), paddock.Harvesting rule: 
+     Manager sending message :- soybean harvest
+     
+      flowering day          =  209                           stover (kg/ha)         =     5627.8
+      maturity day           =    0                           grain yield (kg/ha)    =     3526.6
+      grain % water content  =    8.5                         grain yield wet (kg/ha)=     3854.3
+      grain wt (g)           =    0.000                       grains/m^2             =        0.0
+      grains/plant           =    0.0                         maximum lai            =      6.258
+      total above ground biomass (kg/ha)    =     9154.5
+      live above ground biomass (kg/ha)     =     9154.5
+      green above ground biomass (kg/ha)    =        0.0
+      senesced above ground biomass (kg/ha) =     9154.5
+      number of leaves       =     17.6
+      DM Root:Shoot ratio    =     0.31                       Harvest Index          =       0.39
+      Stover C:N ratio       =    18.83                       Root C:N ratio         =      19.85
+      grain N percent        =     6.50                       total N content (kg/ha)=     348.78
+      grain N uptake (kg/ha) =   229.23                       senesced N content (kg/ha)=  119.55
+      green N content (kg/ha)=     0.00
+     
+      Average Stress Indices:                          Water Photo  Water Expan  N Photo      N grain conc
+         emergence            to end_of_juvenile         0.000        0.000        0.000        0.002
+         end_of_juvenile      to floral_initiation       0.000        0.000        0.000        0.000
+         floral_initiation    to flowering               0.000        0.000        0.000        0.000
+         flowering            to start_grain_fill        0.000        0.000        0.000        0.000
+     
+     
+     Crop harvested.
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                5627.8                     0.0
+                          N  (kg/ha) =                 119.55                    0.00
+     
+         Organic matter removed from system:-      From Tops               From Roots
+                          DM (kg/ha) =                3526.6                     0.0
+                          N  (kg/ha) =                 229.23                    0.00
+     
+      stage 11.0 end_crop
+     Manager sending message :- soybean end_crop
+     Crop ended. Yield (dw) =     0.0  (kg/ha)
+         Organic matter from crop:-      Tops to surface residue      Roots to soil FOM
+                          DM (kg/ha) =                   0.0                  2825.0
+                          N  (kg/ha) =                   0.00                   56.94
+     
+24 December 2019(Day of year=358), clock: 
+     Simulation is terminating due to end criteria being met.
+
