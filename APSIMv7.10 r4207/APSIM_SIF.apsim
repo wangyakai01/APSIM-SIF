@@ -8,7 +8,7 @@
       <filename name="filename" input="yes">%apsim%\DCaPST module\Sharecode\US-Ne2.met</filename>
     </metfile>
     <clock>
-      <start_date type="date" description="Select the start date of the simulation">01/01/2002</start_date>
+      <start_date type="date" description="Select the start date of the simulation">01/01/2017</start_date>
       <end_date type="date" description="Select the end date of the simulation">24/12/2017</end_date>
     </clock>
     <summaryfile />
@@ -1717,10 +1717,7 @@ using ModelFramework;
         </manager2>
         <manager2 name="SIF_C4_short">
           <ui>
-            <ci type="text" description="CO2 concentration within the intercellular air space">250</ci>
-            <tao type="text" description="CO2 concentration at the compensation point">50</tao>
             <p0 type="text" description="The maximum photochemical yield">0.8</p0>
-            <j0 type="text" description="The maximum possible electron transport rate">61.6</j0>
             <KF type="text" description="Fluorescence rate coefficients">0.05</KF>
             <alpha type="text" description="KN fitting parameter alpha ">2.83</alpha>
             <beta type="text" description="KN fitting parameter beta">0.114</beta>
@@ -1765,6 +1762,7 @@ public class Script
 
    [Output] double A;
    [Output] double Je;
+   [Output] double j0;
    [Output] double P;
    [Output] double X;
    [Output] double KN;
@@ -1783,10 +1781,7 @@ public class Script
    [Output] double [] TOT = new double [211];
    [Output] double i0;
    [Output] double fes = 0; 
-   [Param] double ci;
-   [Param] double tao;
-   [Param] double p0;
-   [Param] double j0;
+   [Param] double p0;   
    [Param] double KF;
    [Param] double alpha;
    [Param] double beta;
@@ -1940,14 +1935,15 @@ public class Script
       TE = (EcanSupply == 0 ? 0 : BIOshootDAY / EcanSupply);
       BIOshootDAYPot = dcaps[4] = DM.PotentialBiomass;
       FPAR = RadIntDcapst / radn;
-    
-      GPP = BIOtotalDAY*1000000/44/B/(3600*12);
+      GPP = BIOtotalDAY*1000000/44/B/(3600*12);//The canopy-level photosynthesis
+      
    
       
     
       ////////////////////////////////////////////SIF-C4-short Module ////////////////////By Yakai Wang 15/9/2020//////////////////////////
-
-      Je = GPP;
+      A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;// photosynthesis
+      Je = A;//The actual electron transport rate
+      j0 = RadIntDcapst * 0.5 * p0;// The maximum possible electron transport rate 
       P = p0 * Je / j0;//Photochemical quantum yield
       X = 1 - P / p0;//The degree of light saturation
 
@@ -2003,199 +1999,10 @@ public class Script
             <ref type=" text" description="Path to assembly:">%apsim%/Model/DCaPST.dll</ref>
           </Reference>
         </manager2>
-        <manager name="Sow on a fixed date in 2003">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2003</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2005">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2005</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2007">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2007</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2009">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2009</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2010">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2010</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2011">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2011</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2012">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2012</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2013">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2013</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
-        <manager name="Sow on a fixed date in 2015">
-          <ui>
-            <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2015</date>
-            <category type="category" description="Sowing parameters" />
-            <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
-            <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
-            <depth type="text" description="Enter sowing depth  (mm) : ">50</depth>
-            <cultivar type="cultivars" description="Enter cultivar : ">early</cultivar>
-            <class type="classes" description="Enter crop growth class : ">plant</class>
-            <row_spacing type="text" description="Enter row spacing (mm) : ">500</row_spacing>
-          </ui>
-          <script>
-            <text>
-        if (today = date('[date]') then
-              [crop] sow plants =[density], sowing_depth = [depth], cultivar = [cultivar], row_spacing = [row_spacing], crop_class = [class]
-         endif
-    </text>
-            <event>start_of_day</event>
-          </script>
-        </manager>
         <manager name="Sow on a fixed date in 2016">
           <ui>
             <category type="category" description="Sowing criteria" />
-            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may-2017</date>
+            <date type="text" description="Enter sowing date (dd-mmm) : ">15-may</date>
             <category type="category" description="Sowing parameters" />
             <crop type="crop" description="Enter name of crop to sow : ">maize</crop>
             <density type="text" description="Enter sowing density  (plants/m2) : ">10</density>
@@ -2250,43 +2057,18 @@ public class Script
         </events>
         <Graph name="XY1">
           <Legend>
-            <CheckedTitles>Plot23, Fsingle_spectral_toc,Ne2maizeSIF</CheckedTitles>
-            <CheckedTitles>Plot23, GPP,Ne2maizeSIF</CheckedTitles>
-            <CheckedTitles>Plot2, GPP_U50_f,Ne2GPP2001-2019</CheckedTitles>
-            <CheckedTitles>Plot22, SIF_760_Irrigated,US_Ne2_irrigatedSIF</CheckedTitles>
+            <CheckedTitles> Fsingle_spectral_toc</CheckedTitles>
           </Legend>
           <Plot name="Plot23">
             <SeriesType>Solid line</SeriesType>
-            <PointType>None</PointType>
+            <PointType>Circle</PointType>
             <colour>
             </colour>
-            <Y>Fsingle_spectral_toc</Y>
+            <X>date</X>
             <Y>GPP</Y>
-            <X>date</X>
+            <Y>Fsingle_spectral_toc</Y>
             <GDApsimFileReader name="ApsimFileReader">
-              <FileName>%apsim%\DCaPST module\Sharecode\Ne2maizeSIF.out</FileName>
-            </GDApsimFileReader>
-          </Plot>
-          <Plot name="Plot2">
-            <SeriesType>No line</SeriesType>
-            <PointType>Circle</PointType>
-            <colour>
-            </colour>
-            <Y>GPP_U50_f</Y>
-            <X>date</X>
-            <GDApsimFileReader name="ApsimFileReader">
-              <FileName>%apsim%\DCaPST module\Sharecode\Ne2GPP2001-2019.csv</FileName>
-            </GDApsimFileReader>
-          </Plot>
-          <Plot name="Plot22">
-            <SeriesType>No line</SeriesType>
-            <PointType>Circle</PointType>
-            <colour>
-            </colour>
-            <X>Date</X>
-            <Y>SIF_760_Irrigated</Y>
-            <GDApsimFileReader name="ApsimFileReader">
-              <FileName>%apsim%\DCaPST module\Sharecode\US_Ne2_irrigatedSIF.csv</FileName>
+              <FileName>Ne2maizeSIF.out</FileName>
             </GDApsimFileReader>
           </Plot>
         </Graph>
@@ -2333,7 +2115,7 @@ public class Script
     </metfile>
     <clock>
       <start_date type="date" description="Select the start date of the simulation">01/01/2017</start_date>
-      <end_date type="date" description="Select the end date of the simulation">24/12/2019</end_date>
+      <end_date type="date" description="Select the end date of the simulation">24/12/2017</end_date>
     </clock>
     <summaryfile />
     <area name="paddock">
@@ -4086,7 +3868,6 @@ using ModelFramework;
             <ci type="text" description="CO2 concentration within the intercellular air space">250</ci>
             <tao type="text" description="CO2 concentration at the compensation point">50</tao>
             <p0 type="text" description="The maximum photochemical yield">0.8</p0>
-            <j0 type="text" description="The maximum possible electron transport rate">67</j0>
             <KF type="text" description="Fluorescence rate coefficients">0.05</KF>
             <alpha type="text" description="KN fitting parameter alpha ">2.83</alpha>
             <beta type="text" description="KN fitting parameter beta">0.114</beta>
@@ -4130,6 +3911,7 @@ public class Script
    [Output] public double SoilWater;
    [Output] double A;
    [Output] double Je;
+   [Output] double j0;
    [Output] double P;
    [Output] double X;
    [Output] double KN;
@@ -4148,8 +3930,7 @@ public class Script
    [Output] double fes = 0; 
    [Param] double ci;
    [Param] double tao;
-   [Param] double p0;
-   [Param] double j0;
+   [Param] double p0;   
    [Param] double KF;
    [Param] double alpha;
    [Param] double beta;
@@ -4314,14 +4095,14 @@ public class Script
       BIOshootDAYPot = dcapst[4] = DM.PotentialBiomass;
       SoilWater = SWAvailable;
       FPAR = RadIntDcaps / radn;
+  
       GPP = BIOtotalDAY*1000000/44/B/(3600*12);//The canopy-level photosynthesis
-      
       
       ////////////////////////////////////////////SIF Module by Yakai Wang 15/9/2020////////////////////////////////////////////////
   
-     
-         Je = GPP * ((ci + tao * 2) / (ci - tao));//The actual electron transport rate
-      
+         A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;//photosynthesis
+        Je = A * ((ci + tao * 2) / (ci - tao));//The actual electron transport rate
+        j0 = RadIntDcaps * 0.5 * p0;// The maximum possible electron transport rate 
          P = p0 * Je / j0;//Photochemical quantum yield
          X = 1 - P / p0;//The degree of light saturation
 
@@ -4482,33 +4263,19 @@ public class Script
         </events>
         <Graph name="XY1">
           <Legend>
-            <CheckedTitles>Plot23, Fsingle_spectral_toc,Br1soybeanSIF</CheckedTitles>
-            <CheckedTitles>Plot23, GPP,Br1soybeanSIF</CheckedTitles>
-            <CheckedTitles>Plot22, far-red_SIF,Br1 SIF2</CheckedTitles>
-            <CheckedTitles>Plot22, Gross_Primary_Production,Br1 SIF2</CheckedTitles>
+            <CheckedTitles> GPP</CheckedTitles>
+            <CheckedTitles> Fsingle_spectral_toc</CheckedTitles>
           </Legend>
-          <Plot name="Plot23">
-            <SeriesType>Solid line</SeriesType>
-            <PointType>None</PointType>
-            <colour>
-            </colour>
-            <X>date</X>
-            <Y>Fsingle_spectral_toc</Y>
-            <Y>GPP</Y>
-            <GDApsimFileReader name="ApsimFileReader">
-              <FileName>%apsim%\DCaPST module\Sharecode\Br1soybeanSIF.out</FileName>
-            </GDApsimFileReader>
-          </Plot>
           <Plot name="Plot22">
-            <SeriesType>No line</SeriesType>
+            <SeriesType>Solid line</SeriesType>
             <PointType>Circle</PointType>
             <colour>
             </colour>
             <X>date</X>
-            <Y>far-red_SIF</Y>
-            <Y>Gross_Primary_Production</Y>
+            <Y>GPP</Y>
+            <Y>Fsingle_spectral_toc</Y>
             <GDApsimFileReader name="ApsimFileReader">
-              <FileName>%apsim%\DCaPST module\met\Br1 SIF2.csv</FileName>
+              <FileName>Br1soybeanSIF.out</FileName>
             </GDApsimFileReader>
           </Plot>
         </Graph>
