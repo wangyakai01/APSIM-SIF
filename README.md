@@ -1,7 +1,7 @@
 ﻿# APSIM-SIF
 
 
-（*Agricultural Production Systems Simulator - sun-induced chlorophyll fluorescence*）
+（*Agricultural Production Systems Simulator - Solar-induced chlorophyll fluorescence*）
 
 
 
