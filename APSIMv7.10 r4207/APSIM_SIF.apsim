@@ -3,7 +3,7 @@
     <active>0</active>
     <settings />
   </factorial>
-  <simulation name="Ne2maizeSIF">
+  <simulation name="Ne2maizeSIF1">
     <metfile name="met">
       <filename name="filename" input="yes">%apsim%\DCaPST module\Sharecode\US-Ne2.met</filename>
     </metfile>
@@ -1715,6 +1715,78 @@ using ModelFramework;
       
 }</text>
         </manager2>
+        <manager2 name="rad2PAR">
+          <ui>
+            <A type="text" description="Param A">Parameter value</A>
+          </ui>
+          <text>
+using System;
+using ModelFramework;
+
+public class Script 
+{      
+   [Link] Paddock MyPaddock; // Can be used to dynamically get access to simulation structure and variables
+   [Input] DateTime Today;   // Equates to the value of the current simulation date - value comes from CLOCK
+   //[Param] string A;         // The value for this will come from the Properties page.
+   //[Output] double B;        // An example of how to make a variable available to other APSIM modules
+   [Input] double radn;
+   [Input] int day;
+   [Input] double latitude;
+   [Output] double Io; 
+   [Output] double PAR; 
+   [Output] double Idif; 
+   [Output] double Idir; 
+   [Output] double SZA; 
+
+
+   // The following event handler will be called once at the beginning of the simulation
+   [EventHandler] public void OnInitialised()
+   {
+     
+
+   }
+
+   // The following event handler will be called each day at the beginning of the day
+   [EventHandler] public void OnPrepare()
+   {
+      double sc = 1360;
+      // double RATIO = 0.75;
+
+      double DAY = day;
+      double Lat = latitude;
+      double deg2rad = Math.PI / 180;
+      double Dl = 23.45 * Math.Sin(2 * Math.PI * (248 + DAY) / 365) * Math.PI / 180;
+
+      double Wl=Math.Acos(-(Math.Tan(deg2rad * Lat) * Math.Tan(Dl))) * 180 / Math.PI;//deg
+      double Ll = Wl / 15 * 2;
+      
+      
+      
+      double t = 12;
+      double tfrac = (t - (12 - 0.5 * Ll)) / Ll;
+      double tsunrise = 12 - 0.5 * Ll;
+      double tsunset = 12 + 0.5 * Ll;
+      
+      // double dr = 1 + 0.033 * Math.Cos(2 * Math.PI / 365 * DAY);
+      // double Gsc = 0.0820;
+      // double So=24/Math.PI*60*Gsc*dr*(deg2rad*Wl*Math.Sin(deg2rad*Lat)*Math.Sin(Dl)+Math.Sin(deg2rad*Wl)*Math.Cos(deg2rad*Lat)*Math.Cos(Dl));
+      // double Sg=So*RATIO;//Sg net solar radiation
+      SZA = Math.Acos(Math.Sin(deg2rad * Lat) * Math.Sin(Dl) + Math.Cos(deg2rad * Lat) * Math.Cos(Dl) * Math.Cos(Ll * (tfrac - 0.5) * Math.PI / 12));
+      //Io = radn * Math.PI * Math.Sin(Math.PI * tfrac) / (2 * Ll * 3600) * Math.Pow(10, 6);
+      Io = radn * Math.Pow(10, 6) / (3600 * Ll);
+      Idif = 0.17 * sc * Math.Cos(SZA) / Math.Pow(10, 6) * Math.Pow(10, 6);
+      Idir = Io - Idif;
+
+      PAR = Io * 0.5;//W m-2
+      
+      //double t = 17;
+      
+      
+   }
+
+}
+  </text>
+        </manager2>
         <manager2 name="SIF_C4_short">
           <ui>
             <p0 type="text" description="The maximum photochemical yield">0.8</p0>
@@ -1747,6 +1819,7 @@ public class Script
    [Input] double maxt;
    [Input] double ratio;
    [Input] double [] ratioall;
+   [Input] double PAR;
    //Additional Outputs
    [Output] public double BIOtotalDAY;
    [Output] public double BIOshootDAY;
@@ -1941,9 +2014,11 @@ public class Script
       
     
       ////////////////////////////////////////////SIF-C4-short Module ////////////////////By Yakai Wang 15/9/2020//////////////////////////
-      A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;// photosynthesis
-      Je = A;//The actual electron transport rate
-      j0 = RadIntDcapst * 0.5 * p0;// The maximum possible electron transport rate 
+      //A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;// photosynthesis
+      Je = GPP;//The actual electron transport rate
+      
+      j0 = PAR * FPAR*4.56 * 0.1;// The maximum possible electron transport rate 
+      //j0 = 100;
       P = p0 * Je / j0;//Photochemical quantum yield
       X = 1 - P / p0;//The degree of light saturation
 
@@ -1954,9 +2029,10 @@ public class Script
          KD = 0.87;
       }     
 
-      F = KF / (KF + KN + KD) * (1 - P) * RadIntDcapst;//Emitted fluorescence ( MJ/m2)
-      Fyield = F / RadIntDcapst;//  Fluorescence yield 
-      F = F * 1000000 / (3600 * 24);//Unit conversion from MJ/m2 to W/m2
+      
+      Fyield = KF / (KF + KN + KD) * (1 - P);//  Fluorescence yield
+      F = Fyield * PAR*FPAR;//Emitted fluorescence ( W/m2)      
+     
       Fsingle_spectral_tot = (GPP==0 ? 0 : F * ratio);   //Total fluorescence emitted for single spectral (W/m2/nm)    
       Fsingle_spectral_toc = Fsingle_spectral_tot * fesp / 3.14 * 1000;// Canopy fluorescence emitted for single spectral observed by the senor (mW/m2/nm/sr)
       Fsingle_spectral_tot = Fsingle_spectral_tot * 1000;//Unit mW/m2/nm  
@@ -2023,8 +2099,8 @@ public class Script
       </folder>
       <fertiliser />
       <outputfile>
-        <filename name="filename" output="yes">Ne2maizeSIF.out</filename>
-        <title>Ne2maizeSIF</title>
+        <filename name="filename" output="yes">Ne2maizeSIF1.out</filename>
+        <title>Ne2maizeSIF1</title>
         <variables name="My Variables">
           <variable>dd/mm/yyyy as date</variable>
           <variable>DaysAfterSowing</variable>
@@ -2051,6 +2127,8 @@ public class Script
           <variable>height</variable>
           <variable>stage</variable>
           <variable>Fsingle_spectral_tot</variable>
+          <variable>Fyield</variable>
+          <variable>P</variable>
         </variables>
         <events name="My Variables Events">
           <event>daily</event>
@@ -2068,7 +2146,7 @@ public class Script
             <Y>GPP</Y>
             <Y>Fsingle_spectral_toc</Y>
             <GDApsimFileReader name="ApsimFileReader">
-              <FileName>Ne2maizeSIF.out</FileName>
+              <FileName>Ne2maizeSIF1.out</FileName>
             </GDApsimFileReader>
           </Plot>
         </Graph>
@@ -2109,7 +2187,7 @@ public class Script
       </operations>
     </area>
   </simulation>
-  <simulation name="Br1soybeanSIF">
+  <simulation name="Br1soybeanSIF1">
     <metfile name="met">
       <filename name="filename" input="yes">%apsim%\DCaPST module\Sharecode\US-Br1.met</filename>
     </metfile>
@@ -3863,6 +3941,78 @@ using ModelFramework;
       
 }</text>
         </manager2>
+        <manager2 name="rad2PAR">
+          <ui>
+            <A type="text" description="Param A">Parameter value</A>
+          </ui>
+          <text>
+using System;
+using ModelFramework;
+
+public class Script 
+{      
+   [Link] Paddock MyPaddock; // Can be used to dynamically get access to simulation structure and variables
+   [Input] DateTime Today;   // Equates to the value of the current simulation date - value comes from CLOCK
+   //[Param] string A;         // The value for this will come from the Properties page.
+   //[Output] double B;        // An example of how to make a variable available to other APSIM modules
+   [Input] double radn;
+   [Input] int day;
+   [Input] double latitude;
+   [Output] double Io; 
+   [Output] double PAR; 
+   [Output] double Idif; 
+   [Output] double Idir; 
+   [Output] double SZA; 
+
+
+   // The following event handler will be called once at the beginning of the simulation
+   [EventHandler] public void OnInitialised()
+   {
+     
+
+   }
+
+   // The following event handler will be called each day at the beginning of the day
+   [EventHandler] public void OnPrepare()
+   {
+      double sc = 1360;
+      // double RATIO = 0.75;
+
+      double DAY = day;
+      double Lat = latitude;
+      double deg2rad = Math.PI / 180;
+      double Dl = 23.45 * Math.Sin(2 * Math.PI * (248 + DAY) / 365) * Math.PI / 180;
+
+      double Wl=Math.Acos(-(Math.Tan(deg2rad * Lat) * Math.Tan(Dl))) * 180 / Math.PI;//deg
+      double Ll = Wl / 15 * 2;
+      
+      
+      
+      double t = 12;
+      double tfrac = (t - (12 - 0.5 * Ll)) / Ll;
+      double tsunrise = 12 - 0.5 * Ll;
+      double tsunset = 12 + 0.5 * Ll;
+      
+      // double dr = 1 + 0.033 * Math.Cos(2 * Math.PI / 365 * DAY);
+      // double Gsc = 0.0820;
+      // double So=24/Math.PI*60*Gsc*dr*(deg2rad*Wl*Math.Sin(deg2rad*Lat)*Math.Sin(Dl)+Math.Sin(deg2rad*Wl)*Math.Cos(deg2rad*Lat)*Math.Cos(Dl));
+      // double Sg=So*RATIO;//Sg net solar radiation
+      SZA = Math.Acos(Math.Sin(deg2rad * Lat) * Math.Sin(Dl) + Math.Cos(deg2rad * Lat) * Math.Cos(Dl) * Math.Cos(Ll * (tfrac - 0.5) * Math.PI / 12));
+      //Io = radn * Math.PI * Math.Sin(Math.PI * tfrac) / (2 * Ll * 3600) * Math.Pow(10, 6);
+      Io = radn * Math.Pow(10, 6) / (3600 * Ll);
+      Idif = 0.17 * sc * Math.Cos(SZA) / Math.Pow(10, 6) * Math.Pow(10, 6);
+      Idir = Io - Idif;
+
+      PAR = Io * 0.5;//W m-2
+      
+      //double t = 17;
+      
+      
+   }
+
+}
+  </text>
+        </manager2>
         <manager2 name="SIF-C3">
           <ui>
             <ci type="text" description="CO2 concentration within the intercellular air space">250</ci>
@@ -3896,6 +4046,7 @@ public class Script
    [Input] double maxt;
    [Input] double ratio;
    [Input] double [] ratioall;
+   [Input] double PAR; 
    [Output] public double[] dcapst = new double[5];
    
    //Additional Outputs
@@ -4100,9 +4251,9 @@ public class Script
       
       ////////////////////////////////////////////SIF Module by Yakai Wang 15/9/2020////////////////////////////////////////////////
   
-         A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;//photosynthesis
-        Je = A * ((ci + tao * 2) / (ci - tao));//The actual electron transport rate
-        j0 = RadIntDcaps * 0.5 * p0;// The maximum possible electron transport rate 
+        // A = BIOshootDAY * (1 + RootShoot) / 44 / 0.4;//photosynthesis
+        Je = GPP * ((ci + tao * 2) / (ci - tao));//The actual electron transport rate
+        j0 = PAR * FPAR*4.56 * 0.2;// The maximum possible electron transport rate 
          P = p0 * Je / j0;//Photochemical quantum yield
          X = 1 - P / p0;//The degree of light saturation
 
@@ -4113,9 +4264,10 @@ public class Script
             KD = 0.87;
          }     
 
-         F = KF / (KF + KN + KD) * (1 - P) * RadIntDcaps;//Emitted fluorescence ( MJ/m2)
-         Fyield = F / RadIntDcaps;//  Fluorescence yield 
-         F = F * 1000000 / (3600 * 24);//Unit conversion from MJ/m2 to W/m2
+         
+         Fyield = KF / (KF + KN + KD) * (1 - P);//  Fluorescence yield
+         F = Fyield * PAR*FPAR;//Emitted fluorescence ( W/m2)
+         
          Fsingle_spectral_tot = (GPP == 0 ? 0 : F * ratio);   //Total fluorescence emitted for single spectral (W/m2/nm)    
          Fsingle_spectral_toc = Fsingle_spectral_tot * fesp / 3.14 * 1000;// Canopy fluorescence emitted for single spectral observed by the senor (mW/m2/nm/sr)
          Fsingle_spectral_tot = Fsingle_spectral_tot * 1000;//Unit mW/m2/nm  
@@ -4227,8 +4379,8 @@ public class Script
       </folder>
       <fertiliser />
       <outputfile>
-        <filename name="filename" output="yes">Br1soybeanSIF.out</filename>
-        <title>Br1soybeanSIF</title>
+        <filename name="filename" output="yes">Br1soybeanSIF1.out</filename>
+        <title>Br1soybeanSIF1</title>
         <variables name="My Variables">
           <variable>dd/mm/yyyy as date</variable>
           <variable>DaysAfterSowing</variable>
@@ -4246,7 +4398,7 @@ public class Script
           <variable>EcanDemand</variable>
           <variable>EcanSupply</variable>
           <variable>TE</variable>
-          <variable>RadIntDcapst</variable>
+          <variable>RadIntDcaps</variable>
           <variable>Biomass</variable>
           <variable>Yield</variable>
           <variable>Fsingle_spectral_toc</variable>
@@ -4257,13 +4409,14 @@ public class Script
           <variable>Je</variable>
           <variable>RUE</variable>
           <variable>Fsingle_spectral_tot</variable>
+          <variable>Fyield</variable>
+          <variable>P</variable>
         </variables>
         <events name="My Variables Events">
           <event>daily</event>
         </events>
         <Graph name="XY1">
           <Legend>
-            <CheckedTitles> GPP</CheckedTitles>
             <CheckedTitles> Fsingle_spectral_toc</CheckedTitles>
           </Legend>
           <Plot name="Plot22">
@@ -4275,7 +4428,7 @@ public class Script
             <Y>GPP</Y>
             <Y>Fsingle_spectral_toc</Y>
             <GDApsimFileReader name="ApsimFileReader">
-              <FileName>Br1soybeanSIF.out</FileName>
+              <FileName>Br1soybeanSIF1.out</FileName>
             </GDApsimFileReader>
           </Plot>
         </Graph>

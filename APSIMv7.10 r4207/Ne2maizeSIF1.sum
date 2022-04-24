@@ -10,7 +10,7 @@
              Copyright(c) APSRU               
 
 Version                = 7.10 r4207
-Title                  = Ne2maizeSIF
+Title                  = Ne2maizeSIF1
    Component                        "clock" = %apsim%\Model\Clock.dll
    Component                          "met" = %apsim%\Model\Input.dll
 Paddock:
@@ -79,8 +79,10 @@ Paddock:
         height
         stage
         Fsingle_spectral_tot
+        Fyield
+        P
 
-     Output file = Ne2maizeSIF.out
+     Output file = Ne2maizeSIF1.out
      Format = normal
 
 ------- paddock.accum Initialisation ------------------------------------------
